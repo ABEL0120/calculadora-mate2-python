@@ -5,6 +5,96 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculadora con Euler Mejorado</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #444;
+    }
+
+    form {
+      max-width: 500px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+
+    input {
+      width: calc(100% - 20px);
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #5cb85c;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #4cae4c;
+    }
+
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    thead {
+      background-color: #5cb85c;
+      color: white;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ccc;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    @media (max-width: 600px) {
+      form, table {
+        width: 95%;
+      }
+
+      th, td {
+        font-size: 12px;
+      }
+    }
+  </style>
   <script>
     async function calcular() {
       const f = document.getElementById('f').value;
@@ -12,22 +102,39 @@
       const y0 = parseFloat(document.getElementById('y0').value);
       const xn = parseFloat(document.getElementById('xn').value);
       const h = parseFloat(document.getElementById('h').value);
-      const response = await fetch('/calcular', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ f, x0, y0, xn, h })
-      });
-      const data = await response.json();
-      if (data.status === 200) {
-        const resultados = document.getElementById('resultados');
-        resultados.innerHTML = '';
-        data.resultado.forEach(punto => {
-          const fila = document.createElement('tr');
-          fila.innerHTML = `<td>${punto.x}</td><td>${punto.y}</td>`;
-          resultados.appendChild(fila);
+      try {
+        const response = await fetch('/calcular', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ f, x0, y0, xn, h }),
         });
-      } else {
-        alert(data.message || 'Error en el cálculo');
+
+        if (!response.ok) {
+          throw new Error('Error en la solicitud');
+        }
+
+        const data = await response.json();
+        if (data.status === 200) {
+          const resultados = document.getElementById('resultados');
+          resultados.innerHTML = '';
+          data.resultados.forEach((punto) => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+              <td>${punto.N}</td>
+              <td>${punto.Xn.toFixed(6)}</td>
+              <td>${punto.Yn.toFixed(6)}</td>
+              <td>${punto.Yp.toFixed(6)}</td>
+              <td>${punto.Yr !== "N/A" ? punto.Yr.toFixed(6) : "N/A"}</td>
+              <td>${punto.error.toFixed(6)}</td>
+            `;
+            resultados.appendChild(fila);
+          });
+        } else {
+          alert(data.message || 'Error en el cálculo');
+        }
+      } catch (error) {
+        console.error('Error al realizar la solicitud:', error);
+        alert('Error al realizar la solicitud: ' + error.message);
       }
     }
   </script>
@@ -36,20 +143,34 @@
 <body>
   <h1>Calculadora con Euler Mejorado</h1>
   <form onsubmit="calcular(); return false;">
-    <label>f(x, y): <input id="f" type="text" required></label><br>
-    <label>x0: <input id="x0" type="number" step="any" required></label><br>
-    <label>y0: <input id="y0" type="number" step="any" required></label><br>
-    <label>xn: <input id="xn" type="number" step="any" required></label><br>
-    <label>h: <input id="h" type="number" step="any" required></label><br>
+    <label for="f">f(x, y):</label>
+    <input id="f" type="text" placeholder="Ejemplo: x + y" required>
+    
+    <label for="x0">x0:</label>
+    <input id="x0" type="number" step="any" placeholder="Ejemplo: 0" required>
+    
+    <label for="y0">y0:</label>
+    <input id="y0" type="number" step="any" placeholder="Ejemplo: 1" required>
+    
+    <label for="xn">xn:</label>
+    <input id="xn" type="number" step="any" placeholder="Ejemplo: 1" required>
+    
+    <label for="h">h:</label>
+    <input id="h" type="number" step="any" placeholder="Ejemplo: 0.1" required>
+    
     <button type="submit">Calcular</button>
   </form>
 
   <h2>Resultados</h2>
-  <table border="1">
+  <table>
     <thead>
       <tr>
-        <th>x</th>
-        <th>y</th>
+        <th>N</th>
+        <th>Xn</th>
+        <th>Yn</th>
+        <th>Yp</th>
+        <th>Yr</th>
+        <th>Error</th>
       </tr>
     </thead>
     <tbody id="resultados"></tbody>
