@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora con Euler Mejorado</title>
+  <script>
+    async function calcular() {
+      const f = document.getElementById('f').value;
+      const x0 = parseFloat(document.getElementById('x0').value);
+      const y0 = parseFloat(document.getElementById('y0').value);
+      const xn = parseFloat(document.getElementById('xn').value);
+      const h = parseFloat(document.getElementById('h').value);
+      const response = await fetch('/calcular', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ f, x0, y0, xn, h })
+      });
+      const data = await response.json();
+      if (data.status === 200) {
+        const resultados = document.getElementById('resultados');
+        resultados.innerHTML = '';
+        data.resultado.forEach(punto => {
+          const fila = document.createElement('tr');
+          fila.innerHTML = `<td>${punto.x}</td><td>${punto.y}</td>`;
+          resultados.appendChild(fila);
+        });
+      } else {
+        alert(data.message || 'Error en el cálculo');
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <h1>Calculadora con Euler Mejorado</h1>
+  <form onsubmit="calcular(); return false;">
+    <label>f(x, y): <input id="f" type="text" required></label><br>
+    <label>x0: <input id="x0" type="number" step="any" required></label><br>
+    <label>y0: <input id="y0" type="number" step="any" required></label><br>
+    <label>xn: <input id="xn" type="number" step="any" required></label><br>
+    <label>h: <input id="h" type="number" step="any" required></label><br>
+    <button type="submit">Calcular</button>
+  </form>
+
+  <h2>Resultados</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>x</th>
+        <th>y</th>
+      </tr>
+    </thead>
+    <tbody id="resultados"></tbody>
+  </table>
+</body>
+
+</html>
