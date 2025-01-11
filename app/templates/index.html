@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora con Euler Mejorado</title>
+  <title>Calculadora de Métodos Numéricos</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,9 +14,31 @@
       color: #333;
     }
 
-    h1, h2 {
+    h1 {
       text-align: center;
       color: #444;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .button-container button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #5cb85c;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    .button-container button:hover {
+      background-color: #4cae4c;
     }
 
     form {
@@ -26,6 +48,11 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    form.active {
+      display: block;
     }
 
     label {
@@ -42,7 +69,7 @@
       margin-bottom: 15px;
     }
 
-    button {
+    button[type="submit"] {
       width: 100%;
       padding: 10px;
       background-color: #5cb85c;
@@ -54,7 +81,7 @@
       transition: background-color 0.3s;
     }
 
-    button:hover {
+    button[type="submit"]:hover {
       background-color: #4cae4c;
     }
 
@@ -84,80 +111,76 @@
     tbody tr:hover {
       background-color: #f1f1f1;
     }
-
-    @media (max-width: 600px) {
-      form, table {
-        width: 95%;
-      }
-
-      th, td {
-        font-size: 12px;
-      }
-    }
   </style>
   <script>
-    async function calcular() {
-      const f = document.getElementById('f').value;
-      const x0 = parseFloat(document.getElementById('x0').value);
-      const y0 = parseFloat(document.getElementById('y0').value);
-      const xn = parseFloat(document.getElementById('xn').value);
-      const h = parseFloat(document.getElementById('h').value);
-      try {
-        const response = await fetch('/calcular', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ f, x0, y0, xn, h }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Error en la solicitud');
-        }
-
-        const data = await response.json();
-        if (data.status === 200) {
-          const resultados = document.getElementById('resultados');
-          resultados.innerHTML = '';
-          data.resultados.forEach((punto) => {
-            const fila = document.createElement('tr');
-            fila.innerHTML = `
-              <td>${punto.N}</td>
-              <td>${punto.Xn.toFixed(6)}</td>
-              <td>${punto.Yn.toFixed(6)}</td>
-              <td>${punto.Yp.toFixed(6)}</td>
-              <td>${punto.Yr !== "N/A" ? punto.Yr.toFixed(6) : "N/A"}</td>
-              <td>${punto.error.toFixed(6)}</td>
-            `;
-            resultados.appendChild(fila);
-          });
-        } else {
-          alert(data.message || 'Error en el cálculo');
-        }
-      } catch (error) {
-        console.error('Error al realizar la solicitud:', error);
-        alert('Error al realizar la solicitud: ' + error.message);
-      }
+    function showForm(method) {
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => form.classList.remove('active'));
+      document.getElementById(method).classList.add('active');
     }
   </script>
 </head>
 
 <body>
-  <h1>Calculadora con Euler Mejorado</h1>
-  <form onsubmit="calcular(); return false;">
+  <h1>Calculadora de Métodos Numéricos</h1>
+
+  <div class="button-container">
+    <button onclick="showForm('eulerForm')">Euler Mejorado</button>
+    <button onclick="showForm('newtonForm')">Newton-Raphson</button>
+    <button onclick="showForm('rungeKuttaForm')">Runge-Kutta</button>
+  </div>
+
+  <form id="eulerForm" class="active" onsubmit="calcularEuler(); return false;">
     <label for="f">f(x, y):</label>
     <input id="f" type="text" placeholder="Ejemplo: x + y" required>
-    
+
     <label for="x0">x0:</label>
     <input id="x0" type="number" step="any" placeholder="Ejemplo: 0" required>
-    
+
     <label for="y0">y0:</label>
     <input id="y0" type="number" step="any" placeholder="Ejemplo: 1" required>
-    
+
     <label for="xn">xn:</label>
     <input id="xn" type="number" step="any" placeholder="Ejemplo: 1" required>
-    
+
     <label for="h">h:</label>
     <input id="h" type="number" step="any" placeholder="Ejemplo: 0.1" required>
-    
+
+    <button type="submit">Calcular</button>
+  </form>
+
+  <form id="newtonForm" onsubmit="calcularNewton(); return false;">
+    <label for="func">Función f(x):</label>
+    <input id="func" type="text" placeholder="Ejemplo: x^2 - 2" required>
+
+    <label for="derivada">Derivada f'(x):</label>
+    <input id="derivada" type="text" placeholder="Ejemplo: 2*x" required>
+
+    <label for="xInicial">x inicial:</label>
+    <input id="xInicial" type="number" step="any" placeholder="Ejemplo: 1" required>
+
+    <label for="tolerancia">Tolerancia:</label>
+    <input id="tolerancia" type="number" step="any" placeholder="Ejemplo: 0.0001" required>
+
+    <button type="submit">Calcular</button>
+  </form>
+
+  <form id="rungeKuttaForm" onsubmit="calcularRungeKutta(); return false;">
+    <label for="rk-f">f(x, y):</label>
+    <input id="rk-f" type="text" placeholder="Ejemplo: x + y" required>
+
+    <label for="rk-x0">x0:</label>
+    <input id="rk-x0" type="number" step="any" placeholder="Ejemplo: 0" required>
+
+    <label for="rk-y0">y0:</label>
+    <input id="rk-y0" type="number" step="any" placeholder="Ejemplo: 1" required>
+
+    <label for="rk-xn">xn:</label>
+    <input id="rk-xn" type="number" step="any" placeholder="Ejemplo: 1" required>
+
+    <label for="rk-h">h:</label>
+    <input id="rk-h" type="number" step="any" placeholder="Ejemplo: 0.1" required>
+
     <button type="submit">Calcular</button>
   </form>
 
