@@ -1,228 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora de Métodos Numéricos</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f9;
-      color: #333;
-    }
-
-    h1 {
-      text-align: center;
-      color: #444;
-    }
-
-    .button-container {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 20px 0;
-    }
-
-    .button-container button {
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background-color: #5cb85c;
-      color: white;
-      transition: background-color 0.3s;
-    }
-
-    .button-container button:hover {
-      background-color: #4cae4c;
-    }
-
-    form {
-      max-width: 500px;
-      margin: 20px auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      display: none;
-    }
-
-    form.active {
-      display: block;
-    }
-
-    label {
-      display: block;
-      margin: 10px 0 5px;
-      font-weight: bold;
-    }
-
-    input {
-      width: calc(100% - 20px);
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      margin-bottom: 15px;
-    }
-
-    button[type="submit"] {
-      width: 100%;
-      padding: 10px;
-      background-color: #5cb85c;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button[type="submit"]:hover {
-      background-color: #4cae4c;
-    }
-
-    table {
-      width: 90%;
-      margin: 20px auto;
-      border-collapse: collapse;
-      background: #fff;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    thead {
-      background-color: #5cb85c;
-      color: white;
-    }
-
-    th, td {
-      padding: 10px;
-      text-align: center;
-      border: 1px solid #ccc;
-    }
-
-    tbody tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    tbody tr:hover {
-      background-color: #f1f1f1;
-    }
-  </style>
-  <script>
-    function showForm(method) {
-      const forms = document.querySelectorAll('form');
-      forms.forEach(form => form.classList.remove('active'));
-      document.getElementById(method).classList.add('active');
-    }
-
-    async function calcularEuler() {
-      const f = document.getElementById('f').value;
-      const x0 = parseFloat(document.getElementById('x0').value);
-      const y0 = parseFloat(document.getElementById('y0').value);
-      const xn = parseFloat(document.getElementById('xn').value);
-      const h = parseFloat(document.getElementById('h').value);
-      const response = await fetch('/calcular', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ f, x0, y0, xn, h })
-      });
-      const data = await response.json();
-      if (data.status === 200) {
-        const resultados = document.getElementById('resultados');
-        resultados.innerHTML = '';
-        data.resultados.forEach(punto => {
-          const fila = document.createElement('tr');
-          fila.innerHTML = `<td>${punto.N}</td><td>${punto.Xn}</td><td>${punto.Yn}</td><td>${punto.Yp}</td><td>${punto.Yr}</td><td>${punto.error}</td>`;
-          resultados.appendChild(fila);
-        });
-      } else {
-        alert(data.message || 'Error en el cálculo');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de Métodos Numéricos</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+        color: #333;
       }
-    }
-  </script>
-</head>
 
-<body>
-  <h1>Calculadora de Métodos Numéricos</h1>
+      h1 {
+        text-align: center;
+        color: #444;
+      }
 
-  <div class="button-container">
-    <button onclick="showForm('eulerForm')">Euler Mejorado</button>
-    <button onclick="showForm('newtonForm')">Newton-Raphson</button>
-    <button onclick="showForm('rungeKuttaForm')">Runge-Kutta</button>
-  </div>
+      .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 20px 0;
+      }
 
-  <form id="eulerForm" class="active" onsubmit="calcularEuler(); return false;">
-    <label for="f">f(x, y):</label>
-    <input id="f" type="text" placeholder="Ejemplo: x + y" required>
+      .button-container button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #5cb85c;
+        color: white;
+        transition: background-color 0.3s;
+      }
 
-    <label for="x0">x0:</label>
-    <input id="x0" type="number" step="any" placeholder="Ejemplo: 0" required>
+      .button-container button:hover {
+        background-color: #4cae4c;
+      }
 
-    <label for="y0">y0:</label>
-    <input id="y0" type="number" step="any" placeholder="Ejemplo: 1" required>
+      form {
+        max-width: 500px;
+        margin: 20px auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
 
-    <label for="xn">xn:</label>
-    <input id="xn" type="number" step="any" placeholder="Ejemplo: 1" required>
+      form.active {
+        display: block;
+      }
 
-    <label for="h">h:</label>
-    <input id="h" type="number" step="any" placeholder="Ejemplo: 0.1" required>
+      label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: bold;
+      }
 
-    <button type="submit">Calcular</button>
-  </form>
+      input {
+        width: calc(100% - 20px);
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 15px;
+      }
 
-  <form id="newtonForm" onsubmit="calcularNewton(); return false;">
-    <label for="func">Función f(x):</label>
-    <input id="func" type="text" placeholder="Ejemplo: x^2 - 2" required>
+      button[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        background-color: #5cb85c;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
 
-    <label for="derivada">Derivada f'(x):</label>
-    <input id="derivada" type="text" placeholder="Ejemplo: 2*x" required>
+      button[type="submit"]:hover {
+        background-color: #4cae4c;
+      }
 
-    <label for="xInicial">x inicial:</label>
-    <input id="xInicial" type="number" step="any" placeholder="Ejemplo: 1" required>
+      table {
+        width: 90%;
+        margin: 20px auto;
+        border-collapse: collapse;
+        background: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
-    <label for="tolerancia">Tolerancia:</label>
-    <input id="tolerancia" type="number" step="any" placeholder="Ejemplo: 0.0001" required>
+      thead {
+        background-color: #5cb85c;
+        color: white;
+      }
 
-    <button type="submit">Calcular</button>
-  </form>
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ccc;
+      }
 
-  <form id="rungeKuttaForm" onsubmit="calcularRungeKutta(); return false;">
-    <label for="rk-f">f(x, y):</label>
-    <input id="rk-f" type="text" placeholder="Ejemplo: x + y" required>
+      tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
 
-    <label for="rk-x0">x0:</label>
-    <input id="rk-x0" type="number" step="any" placeholder="Ejemplo: 0" required>
+      tbody tr:hover {
+        background-color: #f1f1f1;
+      }
+    </style>
+    <script>
+      function showForm(method) {
+        const forms = document.querySelectorAll("form");
+        forms.forEach((form) => form.classList.remove("active"));
+        document.getElementById(method).classList.add("active");
+      }
 
-    <label for="rk-y0">y0:</label>
-    <input id="rk-y0" type="number" step="any" placeholder="Ejemplo: 1" required>
+      async function calcularEuler() {
+        const f = document.getElementById("f").value;
+        const x0 = parseFloat(document.getElementById("x0").value);
+        const y0 = parseFloat(document.getElementById("y0").value);
+        const xn = parseFloat(document.getElementById("xn").value);
+        const h = parseFloat(document.getElementById("h").value);
+        const response = await fetch("/calcular", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ f, x0, y0, xn, h }),
+        });
+        const data = await response.json();
+        if (data.status === 200) {
+          const resultados = document.getElementById("resultados");
+          resultados.innerHTML = "";
+          data.resultados.forEach((punto) => {
+            const fila = document.createElement("tr");
+            fila.innerHTML = `<td>${punto.N}</td><td>${punto.Xn}</td><td>${punto.Yn}</td><td>${punto.Yp}</td><td>${punto.Yr}</td><td>${punto.error}</td>`;
+            resultados.appendChild(fila);
+          });
+        } else {
+          alert(data.message || "Error en el cálculo");
+        }
+      }
+    </script>
+  </head>
 
-    <label for="rk-xn">xn:</label>
-    <input id="rk-xn" type="number" step="any" placeholder="Ejemplo: 1" required>
+  <body>
+    <h1>Calculadora de Métodos Numéricos</h1>
 
-    <label for="rk-h">h:</label>
-    <input id="rk-h" type="number" step="any" placeholder="Ejemplo: 0.1" required>
+    <div class="button-container">
+      <button onclick="showForm('eulerForm')">Euler Mejorado</button>
+      <button onclick="showForm('newtonForm')">Newton-Raphson</button>
+      <button onclick="showForm('rungeKuttaForm')">Runge-Kutta</button>
+    </div>
 
-    <button type="submit">Calcular</button>
-  </form>
+    <form
+      id="eulerForm"
+      class="active"
+      onsubmit="calcularEuler(); return false;"
+    >
+      <label for="f">f(x, y):</label>
+      <input id="f" type="text" placeholder="Ejemplo: x + y" required />
 
-  <h2>Resultados</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>N</th>
-        <th>Xn</th>
-        <th>Yn</th>
-        <th>Yp</th>
-        <th>Yr</th>
-        <th>Error</th>
-      </tr>
-    </thead>
-    <tbody id="resultados"></tbody>
-  </table>
-</body>
+      <label for="x0">x0:</label>
+      <input
+        id="x0"
+        type="number"
+        step="any"
+        placeholder="Ejemplo: 0"
+        required
+      />
 
+      <label for="y0">y0:</label>
+      <input
+        id="y0"
+        type="number"
+        step="any"
+        placeholder="Ejemplo: 1"
+        required
+      />
+
+      <label for="xn">xn:</label>
+      <input
+        id="xn"
+        type="number"
+        step="any"
+        placeholder="Ejemplo: 1"
+        required
+      />
+
+      <label for="h">h:</label>
+      <input
+        id="h"
+        type="number"
+        step="any"
+        placeholder="Ejemplo: 0.1"
+        required
+      />
+      <button type="submit">Calcular</button>
+      <h2>Resultados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>N</th>
+            <th>Xn</th>
+            <th>Yn</th>
+            <th>Yp</th>
+            <th>Yr</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+        <tbody id="resultados"></tbody>
+      </table>
+    </form>
+
+    <form id="newtonForm" onsubmit="calcularNewton(); return false;">
+      <label for="func">Función f(x):</label>
+      <input id="func" type="text" placeholder="Ejemplo: x^2 - 2" required />
+
+      <label for="derivada">Derivada f'(x):</label>
+      <input id="derivada" type="text" placeholder="Ejemplo: 2*x" required />
+
+      <label for="xInicial">x inicial:</label>
+      <input
+        id="xInicial"
+        type="number"
+        step="any"
+        placeholder="Ejemplo: 1"
+        required
+      />
+
+      <label for="tolerancia">Tolerancia:</label>
+      <input
+        id="tolerancia"
+        type="number"
+        step="any"
+        placeholder="Ejemplo: 0.0001"
+        required
+      />
+
+      <button type="submit">Calcular</button>
+    </form>
+
+    <form id="rungeKuttaForm" onsubmit="calcularRungeKutta(); return false;">
+      <label for="rk-f">f(x, y):</label>
+      <input id="rk-f" type="text" placeholder="Ejemplo: x + y" required />
+
+      <label for="rk-x0">x0:</label>
+      <input
+        id="rk-x0"
+        type="number"
+        step="any"
+        placeholder="Ejemplo: 0"
+        required
+      />
+
+      <label for="rk-y0">y0:</label>
+      <input
+        id="rk-y0"
+        type="number"
+        step="any"
+        placeholder="Ejemplo: 1"
+        required
+      />
+
+      <label for="rk-xn">xn:</label>
+      <input
+        id="rk-xn"
+        type="number"
+        step="any"
+        placeholder="Ejemplo: 1"
+        required
+      />
+
+      <label for="rk-h">h:</label>
+      <input
+        id="rk-h"
+        type="number"
+        step="any"
+        placeholder="Ejemplo: 0.1"
+        required
+      />
+
+      <button type="submit">Calcular</button>
+    </form>
+  </body>
 </html>
