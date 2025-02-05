@@ -125,7 +125,7 @@
         const y0 = parseFloat(document.getElementById("y0").value);
         const xn = parseFloat(document.getElementById("xn").value);
         const h = parseFloat(document.getElementById("h").value);
-        const response = await fetch("/calcular", {
+        const response = await fetch("/calcular/euler", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ f, x0, y0, xn, h }),
@@ -139,6 +139,35 @@
             fila.innerHTML = `<td>${punto.N}</td><td>${punto.Xn}</td><td>${punto.Yn}</td><td>${punto.Yp}</td><td>${punto.Yr}</td><td>${punto.error}</td>`;
             resultados.appendChild(fila);
           });
+        } else {
+          alert(data.message || "Error en el cálculo");
+        }
+      }
+
+      async function calcularNewton() {
+        const x_ini = document.getElementById("xInicial").value;
+        const funcion = document.getElementById("funcion").value;
+        const res = await fetch("/calcular/newton", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ x_ini: x_ini, funcion: funcion }),
+        });
+        const data = await res.json();
+        if (data.status === 200) {
+          const resultadosTabla = document.getElementById("resultados_2");
+          resultadosTabla.innerHTML = "";
+          data.tabla.forEach((iteracionData) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+        <td>${iteracionData.iteracion}</td>
+        <td>${iteracionData.x0}</td>
+        <td>${iteracionData["f(x0)"]}</td>
+        <td>${iteracionData["df(x0)"]}</td>
+        <td>${iteracionData.x1}</td>
+      `;
+            resultadosTabla.appendChild(row);
+          });
+          alert(`Raíz: ${data.resultados.raiz}`);
         } else {
           alert(data.message || "Error en el cálculo");
         }
@@ -216,12 +245,6 @@
     </form>
 
     <form id="newtonForm" onsubmit="calcularNewton(); return false;">
-      <label for="func">Función f(x):</label>
-      <input id="func" type="text" placeholder="Ejemplo: x^2 - 2" required />
-
-      <label for="derivada">Derivada f'(x):</label>
-      <input id="derivada" type="text" placeholder="Ejemplo: 2*x" required />
-
       <label for="xInicial">x inicial:</label>
       <input
         id="xInicial"
@@ -230,17 +253,27 @@
         placeholder="Ejemplo: 1"
         required
       />
-
-      <label for="tolerancia">Tolerancia:</label>
+      <label for="funcion">Función f(x):</label>
       <input
-        id="tolerancia"
-        type="number"
-        step="any"
-        placeholder="Ejemplo: 0.0001"
+        id="funcion"
+        type="text"
+        placeholder="Ejemplo: x**2 - 2"
         required
       />
-
       <button type="submit">Calcular</button>
+      <h2>Resultados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Iteración</th>
+            <th>x0</th>
+            <th>f(x0)</th>
+            <th>df(x0)</th>
+            <th>x1</th>
+          </tr>
+        </thead>
+        <tbody id="resultados_2"></tbody>
+      </table>
     </form>
 
     <form id="rungeKuttaForm" onsubmit="calcularRungeKutta(); return false;">

@@ -11,11 +11,10 @@ def index():
     return render_template("index.html")
 
 
-# APIS
-@main_bp.route("/calcular", methods=["POST"])
-
-# FUNCIONES
-def calcular():
+# APIS EULER
+@main_bp.route("/calcular/euler", methods=["POST"])
+# Funcion EULER
+def calcularEuler():
     data = request.json
     errores = validar_entrada(data)
     if errores:
@@ -39,6 +38,30 @@ def calcular():
     print(tabla)
     return jsonify(
         {"message": "Cálculo realizado con éxito.", "resultados": tabla, "status": 200}
+    )
+
+
+# Funcion Newton
+@main_bp.route("/calcular/newton", methods=["POST"])
+def calcularNewton():
+    data = request.json
+    f = data["funcion"]
+    x_ini = float(data["x_ini"])
+    resultados, tabla = newton_raphson(f, x_ini)
+    resultados["raiz"] = float(resultados["raiz"])
+    resultados["iteraciones"] = int(resultados["iteraciones"])
+    for iteracion in tabla:
+        iteracion["x0"] = round(float(iteracion["x0"]), 5)
+        iteracion["f(x0)"] = round(float(iteracion["f(x0)"]), 5)
+        iteracion["df(x0)"] = round(float(iteracion["df(x0)"]), 5)
+        iteracion["x1"] = round(float(iteracion["x1"]), 5)
+    return jsonify(
+        {
+            "message": "Cálculo realizado con éxito.",
+            "resultados": resultados,
+            "tabla": tabla,
+            "status": 200,
+        }
     )
 
 
@@ -70,6 +93,36 @@ def euler_mejorado(f, x0, y0, xn, h):
         n += 1
     return tabla
 
+
+def newton_raphson(f, x0):
+    f_expr = sympy.sympify(f)
+    df = sympy.diff(f_expr)
+    x = sympy.symbols("x")
+    tol = 1e-6
+    max_iter = 100
+    iteracion = 0
+    tabla = []
+    while iteracion < max_iter:
+        f_val = f_expr.subs(x, x0).evalf()
+        df_val = df.subs(x, x0).evalf()
+        if df_val == 0:
+            break
+        x1 = x0 - f_val / df_val
+        if abs(f_val) < tol:
+            break
+        tabla.append(
+            {
+                "iteracion": iteracion,
+                "x0": x0,
+                "f(x0)": f_val,
+                "df(x0)": df_val,
+                "x1": x1,
+            }
+        )
+        x0 = x1
+        iteracion += 1
+    resultados = {"raiz": x1, "iteraciones": iteracion}
+    return resultados, tabla
 
 def calcular_valor_real(a):
     resultado = math.exp((0.2 * (a**2)) - 0.2)
