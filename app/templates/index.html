@@ -118,6 +118,31 @@
       forms.forEach(form => form.classList.remove('active'));
       document.getElementById(method).classList.add('active');
     }
+
+    async function calcularEuler() {
+      const f = document.getElementById('f').value;
+      const x0 = parseFloat(document.getElementById('x0').value);
+      const y0 = parseFloat(document.getElementById('y0').value);
+      const xn = parseFloat(document.getElementById('xn').value);
+      const h = parseFloat(document.getElementById('h').value);
+      const response = await fetch('/calcular', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ f, x0, y0, xn, h })
+      });
+      const data = await response.json();
+      if (data.status === 200) {
+        const resultados = document.getElementById('resultados');
+        resultados.innerHTML = '';
+        data.resultados.forEach(punto => {
+          const fila = document.createElement('tr');
+          fila.innerHTML = `<td>${punto.N}</td><td>${punto.Xn}</td><td>${punto.Yn}</td><td>${punto.Yp}</td><td>${punto.Yr}</td><td>${punto.error}</td>`;
+          resultados.appendChild(fila);
+        });
+      } else {
+        alert(data.message || 'Error en el cálculo');
+      }
+    }
   </script>
 </head>
 

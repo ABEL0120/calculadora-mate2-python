@@ -25,7 +25,7 @@ def calcular():
     xn = float(data['xn'])
     h = float(data['h'])
     tabla = euler_mejorado(f, x0, y0, xn, h)
-    
+    print(tabla)
     return jsonify({'message': 'Cálculo realizado con éxito.', 'resultados': tabla, 'status': 200})
 
 
