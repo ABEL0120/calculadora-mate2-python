@@ -5,118 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculadora de Métodos Numéricos</title>
     <style>
+      /* Estilo general */
       body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f9;
-        color: #333;
+        font-family: "Poppins", sans-serif;
+        background-color: #121212;
+        color: #fff;
+        text-align: center;
+        padding: 20px;
       }
 
       h1 {
-        text-align: center;
-        color: #444;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #ff9800;
       }
 
+      /* Botones de selección */
       .button-container {
         display: flex;
         justify-content: center;
-        gap: 10px;
-        margin: 20px 0;
+        gap: 15px;
+        margin-bottom: 20px;
       }
 
       .button-container button {
-        padding: 10px 20px;
-        font-size: 16px;
+        background: linear-gradient(135deg, #ff9800, #ff5722);
         border: none;
-        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #fff;
+        border-radius: 8px;
         cursor: pointer;
-        background-color: #5cb85c;
-        color: white;
-        transition: background-color 0.3s;
+        transition: transform 0.2s, box-shadow 0.2s;
       }
 
       .button-container button:hover {
-        background-color: #4cae4c;
+        transform: scale(1.1);
+        box-shadow: 0px 0px 10px rgba(255, 152, 0, 0.8);
       }
 
+      /* Formularios */
       form {
-        max-width: 500px;
-        margin: 20px auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         display: none;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(255, 152, 0, 0.5);
+        width: 50%;
+        margin: auto;
+        text-align: left;
       }
 
       form.active {
         display: block;
       }
 
+      /* Inputs */
       label {
-        display: block;
-        margin: 10px 0 5px;
+        font-size: 1rem;
         font-weight: bold;
+        display: block;
+        margin-top: 10px;
       }
 
       input {
         width: calc(100% - 20px);
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        margin-bottom: 15px;
-      }
-
-      button[type="submit"] {
-        width: 100%;
-        padding: 10px;
-        background-color: #5cb85c;
-        color: white;
-        font-size: 16px;
+        padding: 8px;
+        margin-top: 5px;
         border: none;
         border-radius: 5px;
+        font-size: 1rem;
+      }
+
+      /* Botón de submit */
+      button[type="submit"] {
+        width: 100%;
+        background: linear-gradient(135deg, #ff5722, #d84315);
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
         cursor: pointer;
-        transition: background-color 0.3s;
+        margin-top: 20px;
+        transition: transform 0.2s, box-shadow 0.2s;
       }
 
       button[type="submit"]:hover {
-        background-color: #4cae4c;
+        transform: scale(1.05);
+        box-shadow: 0px 0px 10px rgba(255, 87, 34, 0.8);
       }
 
+      /* Resultados */
+      h2 {
+        margin-top: 20px;
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        color: #ff9800;
+      }
+
+      /* Tablas */
       table {
-        width: 90%;
-        margin: 20px auto;
+        width: 100%;
+        margin-top: 20px;
         border-collapse: collapse;
-        background: #fff;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
-
-      thead {
-        background-color: #5cb85c;
-        color: white;
+        box-shadow: 0px 0px 10px rgba(255, 152, 0, 0.5);
+        border-radius: 8px;
+        overflow: hidden;
       }
 
       th,
       td {
         padding: 10px;
+        border: 1px solid rgba(255, 152, 0, 0.3);
         text-align: center;
-        border: 1px solid #ccc;
       }
 
-      tbody tr:nth-child(even) {
-        background-color: #f9f9f9;
+      th {
+        background: #ff9800;
+        color: #121212;
       }
 
-      tbody tr:hover {
-        background-color: #f1f1f1;
+      tr:nth-child(even) {
+        background: rgba(255, 255, 255, 0.1);
       }
     </style>
     <script>
-      function showForm(method) {
-        const forms = document.querySelectorAll("form");
-        forms.forEach((form) => form.classList.remove("active"));
-        document.getElementById(method).classList.add("active");
+      function showForm(formId) {
+        document.querySelectorAll("form").forEach((form) => {
+          form.classList.remove("active");
+        });
+        document.getElementById(formId).classList.add("active");
       }
 
       async function calcularEuler() {
@@ -304,7 +327,7 @@
       <h2>Resultados</h2>
       <p id="resultadoRaiz"><strong>Raíz:</strong></p>
 
-      <table border="1">
+      <table>
         <thead>
           <tr>
             <th>Iteración</th>
@@ -340,7 +363,7 @@
         required
       />
 
-      <label for="rk-xn">xf:</label>
+      <label for="rk-xn">xn:</label>
       <input
         id="rk-xn"
         type="number"
