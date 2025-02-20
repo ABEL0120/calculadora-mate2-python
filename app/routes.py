@@ -47,14 +47,15 @@ def calcularNewton():
     data = request.json
     f = data["funcion"]
     x_ini = float(data["x_ini"])
-    resultados, tabla = newton_raphson(f, x_ini)
-    resultados["raiz"] = float(resultados["raiz"])
+    precision = int(data.get("precision", 6))
+    resultados, tabla = newton_raphson(f, x_ini, precision)
+    resultados["raiz"] = round(float(resultados["raiz"]), precision)
     resultados["iteraciones"] = int(resultados["iteraciones"])
     for iteracion in tabla:
-        iteracion["x0"] = round(float(iteracion["x0"]), 5)
-        iteracion["f(x0)"] = round(float(iteracion["f(x0)"]), 5)
-        iteracion["df(x0)"] = round(float(iteracion["df(x0)"]), 5)
-        iteracion["x1"] = round(float(iteracion["x1"]), 5)
+        iteracion["x0"] = round(float(iteracion["x0"]), precision)
+        iteracion["f(x0)"] = round(float(iteracion["f(x0)"]), precision)
+        iteracion["df(x0)"] = round(float(iteracion["df(x0)"]), precision)
+        iteracion["x1"] = round(float(iteracion["x1"]), precision)
     return jsonify(
         {
             "message": "Cálculo realizado con éxito.",
@@ -123,11 +124,11 @@ def euler_mejorado(f, x0, y0, xn, h):
     return tabla
 
 
-def newton_raphson(f, x0):
+def newton_raphson(f, x0, precision):
     f_expr = sympy.sympify(f)
     df = sympy.diff(f_expr)
     x = sympy.symbols("x")
-    tol = 1e-6
+    tol = 10 ** (-precision)
     max_iter = 100
     iteracion = 0
     tabla = []
@@ -137,12 +138,15 @@ def newton_raphson(f, x0):
         if df_val == 0:
             break
         x1 = x0 - f_val / df_val
+        f_val = round(f_val, precision)
+        df_val = round(df_val, precision)
+        x1 = round(x1, precision)
         if abs(f_val) < tol:
             break
         tabla.append(
             {
                 "iteracion": iteracion,
-                "x0": x0,
+                "x0": round(x0, precision),
                 "f(x0)": f_val,
                 "df(x0)": df_val,
                 "x1": x1,

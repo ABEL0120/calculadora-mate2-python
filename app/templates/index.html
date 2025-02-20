@@ -147,27 +147,36 @@
       async function calcularNewton() {
         const x_ini = document.getElementById("xInicial").value;
         const funcion = document.getElementById("funcion").value;
+        const precision = document.getElementById("precision").value;
         const res = await fetch("/calcular/newton", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ x_ini: x_ini, funcion: funcion }),
+          body: JSON.stringify({
+            x_ini: x_ini,
+            funcion: funcion,
+            precision: parseInt(precision),
+          }),
         });
         const data = await res.json();
         if (data.status === 200) {
           const resultadosTabla = document.getElementById("resultados_2");
           resultadosTabla.innerHTML = "";
+
           data.tabla.forEach((iteracionData) => {
             const row = document.createElement("tr");
             row.innerHTML = `
         <td>${iteracionData.iteracion}</td>
-        <td>${iteracionData.x0}</td>
-        <td>${iteracionData["f(x0)"]}</td>
-        <td>${iteracionData["df(x0)"]}</td>
-        <td>${iteracionData.x1}</td>
+        <td>${iteracionData.x0.toFixed(precision)}</td>
+        <td>${iteracionData["f(x0)"].toFixed(precision)}</td>
+        <td>${iteracionData["df(x0)"].toFixed(precision)}</td>
+        <td>${iteracionData.x1.toFixed(precision)}</td>
       `;
             resultadosTabla.appendChild(row);
           });
-          alert(`Raíz: ${data.resultados.raiz}`);
+
+          document.getElementById(
+            "resultadoRaiz"
+          ).innerText = `Raíz: ${data.resultados.raiz.toFixed(precision)}`;
         } else {
           alert(data.message || "Error en el cálculo");
         }
@@ -278,6 +287,7 @@
         placeholder="Ejemplo: 1"
         required
       />
+
       <label for="funcion">Función f(x):</label>
       <input
         id="funcion"
@@ -285,9 +295,16 @@
         placeholder="Ejemplo: x**2 - 2"
         required
       />
+
+      <label for="precision">Precisión (decimales):</label>
+      <input id="precision" type="number" min="1" max="10" value="6" required />
+
       <button type="submit">Calcular</button>
+
       <h2>Resultados</h2>
-      <table>
+      <p id="resultadoRaiz"><strong>Raíz:</strong></p>
+
+      <table border="1">
         <thead>
           <tr>
             <th>Iteración</th>
