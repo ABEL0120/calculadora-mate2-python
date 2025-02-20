@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify
 import math
 import sympy
+from sympy import lambdify, sympify
 
 main_bp = Blueprint("main", __name__)
 
@@ -13,7 +14,6 @@ def index():
 
 # APIS EULER
 @main_bp.route("/calcular/euler", methods=["POST"])
-# Funcion EULER
 def calcularEuler():
     data = request.json
     errores = validar_entrada(data)
@@ -62,6 +62,35 @@ def calcularNewton():
             "tabla": tabla,
             "status": 200,
         }
+    )
+
+
+# Funcion Runge-Kutta
+@main_bp.route("/calcular/runge-kutta", methods=["POST"])
+def calcularRungeKutta():
+    data = request.json
+    errores = validar_entrada(data)
+    if errores:
+        return (
+            jsonify(
+                {
+                    "message": "Error en los datos ingresados.",
+                    "errores": errores,
+                    "status": 400,
+                }
+            ),
+            400,
+        )
+
+    f = data["f"]
+    x0 = float(data["x0"])
+    y0 = float(data["y0"])
+    xn = float(data["xn"])
+    h = float(data["h"])
+    tabla = runge_kutta(f, x0, y0, xn, h)
+    print(tabla)
+    return jsonify(
+        {"message": "Cálculo realizado con éxito.", "resultados": tabla, "status": 200}
     )
 
 
@@ -123,6 +152,38 @@ def newton_raphson(f, x0):
         iteracion += 1
     resultados = {"raiz": x1, "iteraciones": iteracion}
     return resultados, tabla
+
+
+def runge_kutta(f, x0, y0, xn, h):
+    x, y = sympy.symbols("x y")
+    f_expr = sympify(f)
+    f_lambda = lambdify((x, y), f_expr)
+    tabla = []
+    xi, yi = x0, y0
+    n = 0
+    while xi < xn:
+        k1 = f_lambda(xi, yi)
+        k2 = f_lambda(xi + h / 2, yi + (h * k1) / 2)
+        k3 = f_lambda(xi + h / 2, yi + (h * k2) / 2)
+        k4 = f_lambda(xi + h, yi + h * k3)
+        yi_next = yi + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
+        tabla.append(
+            {
+                "N": n,
+                "Xn": round(xi, 6),
+                "Yn": round(yi, 6),
+                "K1": round(k1, 6),
+                "K2": round(k2, 6),
+                "K3": round(k3, 6),
+                "K4": round(k4, 6),
+                "Yn+1": round(yi_next, 6),
+            }
+        )
+        yi = yi_next
+        xi += h
+        n += 1
+    return tabla
+
 
 def calcular_valor_real(a):
     resultado = math.exp((0.2 * (a**2)) - 0.2)

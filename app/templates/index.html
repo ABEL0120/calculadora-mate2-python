@@ -172,6 +172,31 @@
           alert(data.message || "Error en el cálculo");
         }
       }
+
+      async function calcularRungeKutta() {
+        const f = document.getElementById("rk-f").value;
+        const x0 = parseFloat(document.getElementById("rk-x0").value);
+        const y0 = parseFloat(document.getElementById("rk-y0").value);
+        const xn = parseFloat(document.getElementById("rk-xn").value);
+        const h = parseFloat(document.getElementById("rk-h").value);
+        const response = await fetch("/calcular/runge-kutta", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ f, x0, y0, xn, h }),
+        });
+        const data = await response.json();
+        if (data.status === 200) {
+          const resultados = document.getElementById("resultados_3");
+          resultados.innerHTML = "";
+          data.resultados.forEach((punto) => {
+            const fila = document.createElement("tr");
+            fila.innerHTML = `<td>${punto.N}</td><td>${punto.Xn}</td><td>${punto.Yn}</td><td>${punto.K1}</td><td>${punto.K2}</td><td>${punto.K3}</td><td>${punto.K4}</td><td>${punto["Yn+1"]}</td>`;
+            resultados.appendChild(fila);
+          });
+        } else {
+          alert(data.message || "Error en el cálculo");
+        }
+      }
     </script>
   </head>
 
@@ -298,7 +323,7 @@
         required
       />
 
-      <label for="rk-xn">xn:</label>
+      <label for="rk-xn">xf:</label>
       <input
         id="rk-xn"
         type="number"
@@ -317,6 +342,22 @@
       />
 
       <button type="submit">Calcular</button>
+      <h2>Resultados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>N</th>
+            <th>Xn</th>
+            <th>Yn</th>
+            <th>K1</th>
+            <th>K2</th>
+            <th>K3</th>
+            <th>K4</th>
+            <th>Yn+1</th>
+          </tr>
+        </thead>
+        <tbody id="resultados_3"></tbody>
+      </table>
     </form>
   </body>
 </html>
