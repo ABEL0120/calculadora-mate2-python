@@ -75,17 +75,6 @@ Para comenzar a utilizar el Proyecto Calculadora, sigue estos pasos de instalaci
 3. Haz clic en **Calcular**.
 4. Los resultados se mostrarán en una tabla con las columnas `N`, `Xn`, `Yn`, `K1`, `K2`, `K3`, `K4` y `Yn+1`.
 
-#### Método de Bisección
-
-1. Haz clic en el botón **Bisección**.
-2. Completa los campos del formulario:
-   - **Función f(x)**: Ingresa la función en términos de `x`. Ejemplo: `x**2 - 4`.
-   - **a**: Ingresa el valor inicial del intervalo `a`. Ejemplo: `0`.
-   - **b**: Ingresa el valor final del intervalo `b`. Ejemplo: `3`.
-   - **Tolerancia**: Ingresa el valor de la tolerancia. Ejemplo: `0.001`.
-3. Haz clic en **Calcular**.
-4. Los resultados se mostrarán en una tabla con las columnas `Iteración`, `a`, `b`, `c`, `f(c)` y `Error`.
-
 ---
 
 ### Ejemplos de Funciones
