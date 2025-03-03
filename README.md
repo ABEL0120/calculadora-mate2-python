@@ -77,21 +77,6 @@ Para comenzar a utilizar el Proyecto Calculadora, sigue estos pasos de instalaci
 
 ---
 
-### Ejemplos de Funciones
-
-- **Euler Mejorado y Runge-Kutta**:
-
-  - `f(x, y) = x + y`
-  - `f(x, y) = x**2 + y**2`
-  - `f(x, y) = sin(x) + cos(y)`
-
-- **Newton-Raphson**:
-  - `f(x) = x**2 - 2`
-  - `f(x) = x**3 - x - 1`
-  - `f(x) = exp(x) - 3*x`
-
----
-
 ### Notas Importantes
 
 - Indicar con `*` las multiplicaciones, no se aceptan dos caracteres juntos como `xy`.
@@ -111,4 +96,4 @@ Para comenzar a utilizar el Proyecto Calculadora, sigue estos pasos de instalaci
     - **Incorrecto**: `2 * √xy`
     - **Correcto**: `2 * √(x * y)`
 
-En el archivo `ejemplos.txt` están algunos ejemplos para probar los 3 métodos.
+En el archivo [`examples.txt`](./examples.txt) están algunos ejemplos para probar los 3 métodos.
