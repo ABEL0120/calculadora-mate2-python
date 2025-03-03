@@ -29,41 +29,73 @@ def calcularEuler():
             400,
         )
 
-    f = data["f"]
-    x0 = float(data["x0"])
-    y0 = float(data["y0"])
-    xn = float(data["xn"])
-    h = float(data["h"])
-    tabla = euler_mejorado(f, x0, y0, xn, h)
-    print(tabla)
-    return jsonify(
-        {"message": "Cálculo realizado con éxito.", "resultados": tabla, "status": 200}
-    )
+    try:
+        f = data["f"]
+        x0 = float(data["x0"])
+        y0 = float(data["y0"])
+        xn = float(data["xn"])
+        h = float(data["h"])
+        tabla = euler_mejorado(f, x0, y0, xn, h)
+        return jsonify(
+            {
+                "message": "Cálculo realizado con éxito.",
+                "resultados": tabla,
+                "status": 200,
+            }
+        )
+    except Exception as e:
+        return (
+            jsonify(
+                {"message": "Error en el cálculo.", "error": str(e), "status": 500}
+            ),
+            500,
+        )
 
 
 # Funcion Newton
 @main_bp.route("/calcular/newton", methods=["POST"])
 def calcularNewton():
     data = request.json
-    f = data["funcion"]
-    x_ini = float(data["x_ini"])
-    precision = int(data.get("precision", 6))
-    resultados, tabla = newton_raphson(f, x_ini, precision)
-    resultados["raiz"] = round(float(resultados["raiz"]), precision)
-    resultados["iteraciones"] = int(resultados["iteraciones"])
-    for iteracion in tabla:
-        iteracion["x0"] = round(float(iteracion["x0"]), precision)
-        iteracion["f(x0)"] = round(float(iteracion["f(x0)"]), precision)
-        iteracion["df(x0)"] = round(float(iteracion["df(x0)"]), precision)
-        iteracion["x1"] = round(float(iteracion["x1"]), precision)
-    return jsonify(
-        {
-            "message": "Cálculo realizado con éxito.",
-            "resultados": resultados,
-            "tabla": tabla,
-            "status": 200,
-        }
-    )
+    errores = validar_entrada_newton(data)
+    if errores:
+        return (
+            jsonify(
+                {
+                    "message": "Error en los datos ingresados.",
+                    "errores": errores,
+                    "status": 400,
+                }
+            ),
+            400,
+        )
+
+    try:
+        f = data["funcion"]
+        x_ini = float(data["x_ini"])
+        precision = int(data.get("precision", 6))
+        resultados, tabla = newton_raphson(f, x_ini, precision)
+        resultados["raiz"] = round(float(resultados["raiz"]), precision)
+        resultados["iteraciones"] = int(resultados["iteraciones"])
+        for iteracion in tabla:
+            iteracion["x0"] = round(float(iteracion["x0"]), precision)
+            iteracion["f(x0)"] = round(float(iteracion["f(x0)"]), precision)
+            iteracion["df(x0)"] = round(float(iteracion["df(x0)"]), precision)
+            iteracion["x1"] = round(float(iteracion["x1"]), precision)
+        return jsonify(
+            {
+                "message": "Cálculo realizado con éxito.",
+                "resultados": resultados,
+                "tabla": tabla,
+                "status": 200,
+            }
+        )
+    except Exception as e:
+        return (
+            jsonify(
+                {"message": "Error en el cálculo.", "error": str(e), "status": 500}
+            ),
+            500,
+        )
 
 
 # Funcion Runge-Kutta
@@ -83,16 +115,27 @@ def calcularRungeKutta():
             400,
         )
 
-    f = data["f"]
-    x0 = float(data["x0"])
-    y0 = float(data["y0"])
-    xn = float(data["xn"])
-    h = float(data["h"])
-    tabla = runge_kutta(f, x0, y0, xn, h)
-    print(tabla)
-    return jsonify(
-        {"message": "Cálculo realizado con éxito.", "resultados": tabla, "status": 200}
-    )
+    try:
+        f = data["f"]
+        x0 = float(data["x0"])
+        y0 = float(data["y0"])
+        xn = float(data["xn"])
+        h = float(data["h"])
+        tabla = runge_kutta(f, x0, y0, xn, h)
+        return jsonify(
+            {
+                "message": "Cálculo realizado con éxito.",
+                "resultados": tabla,
+                "status": 200,
+            }
+        )
+    except Exception as e:
+        return (
+            jsonify(
+                {"message": "Error en el cálculo.", "error": str(e), "status": 500}
+            ),
+            500,
+        )
 
 
 def euler_mejorado(f, x0, y0, xn, h):
@@ -141,7 +184,7 @@ def newton_raphson(f, x0, precision):
         f_val = round(f_val, precision)
         df_val = round(df_val, precision)
         x1 = round(x1, precision)
-        if abs(f_val) < tol:
+        if abs(x1 - x0) < tol:
             break
         tabla.append(
             {
@@ -211,4 +254,29 @@ def validar_entrada(data):
                 float(data[key])
             except ValueError:
                 errores.append(f"El valor '{key}' debe ser un número válido.")
+    return errores
+
+
+def validar_entrada_newton(data):
+    errores = []
+    try:
+        x = sympy.symbols("x")
+        f_expr = sympy.sympify(data["funcion"])
+        if not any(var in f_expr.free_symbols for var in (x,)):
+            errores.append("La función debe depender de 'x'.")
+    except (sympy.SympifyError, KeyError):
+        errores.append("La función f(x) no es válida o no fue proporcionada.")
+    for key in ["x_ini"]:
+        if key not in data:
+            errores.append(f"El valor '{key}' es requerido.")
+        else:
+            try:
+                float(data[key])
+            except ValueError:
+                errores.append(f"El valor '{key}' debe ser un número válido.")
+    if "precision" in data:
+        try:
+            int(data["precision"])
+        except ValueError:
+            errores.append("El valor 'precision' debe ser un número entero.")
     return errores

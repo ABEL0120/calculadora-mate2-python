@@ -135,6 +135,16 @@
       }
     </style>
     <script>
+      function clearTable(tableId) {
+        const tableBody = document.getElementById(tableId);
+        tableBody.innerHTML = "";
+      }
+
+      function clearInputs(formId) {
+        const form = document.getElementById(formId);
+        form.querySelectorAll("input").forEach((input) => (input.value = ""));
+      }
+
       function showForm(formId) {
         document.querySelectorAll("form").forEach((form) => {
           form.classList.remove("active");
@@ -143,6 +153,7 @@
       }
 
       async function calcularEuler() {
+        clearTable("resultados");
         const f = document.getElementById("f").value;
         const x0 = parseFloat(document.getElementById("x0").value);
         const y0 = parseFloat(document.getElementById("y0").value);
@@ -165,9 +176,11 @@
         } else {
           alert(data.message || "Error en el cálculo");
         }
+        // clearInputs("eulerForm");
       }
 
       async function calcularNewton() {
+        clearTable("resultados_2");
         const x_ini = document.getElementById("xInicial").value;
         const funcion = document.getElementById("funcion").value;
         const precision = document.getElementById("precision").value;
@@ -203,9 +216,11 @@
         } else {
           alert(data.message || "Error en el cálculo");
         }
+        // clearInputs("newtonForm");
       }
 
       async function calcularRungeKutta() {
+        clearTable("resultados_3");
         const f = document.getElementById("rk-f").value;
         const x0 = parseFloat(document.getElementById("rk-x0").value);
         const y0 = parseFloat(document.getElementById("rk-y0").value);
@@ -228,6 +243,7 @@
         } else {
           alert(data.message || "Error en el cálculo");
         }
+        // clearInputs("rungeKuttaForm");
       }
     </script>
   </head>
@@ -286,7 +302,7 @@
       />
       <button type="submit">Calcular</button>
       <h2>Resultados</h2>
-      <table>
+      <table id="tabla">
         <thead>
           <tr>
             <th>N</th>
@@ -310,7 +326,6 @@
         placeholder="Ejemplo: 1"
         required
       />
-
       <label for="funcion">Función f(x):</label>
       <input
         id="funcion"
@@ -318,15 +333,11 @@
         placeholder="Ejemplo: x**2 - 2"
         required
       />
-
       <label for="precision">Precisión (decimales):</label>
       <input id="precision" type="number" min="1" max="10" value="6" required />
-
       <button type="submit">Calcular</button>
-
       <h2>Resultados</h2>
       <p id="resultadoRaiz"><strong>Raíz:</strong></p>
-
       <table>
         <thead>
           <tr>
