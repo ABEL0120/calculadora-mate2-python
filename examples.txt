@@ -1,0 +1,53 @@
+
+# Ejemplos para Método de Euler Mejorado
+# f(x, y) = x + y, x0 = 0, y0 = 1, xn = 1, h = 0.1
+{
+  "f": "x + y",
+  "x0": 0,
+  "y0": 1,
+  "xn": 1,
+  "h": 0.1
+}
+
+# f(x, y) = x**2 + y**2, x0 = 0, y0 = 1, xn = 1, h = 0.1
+{
+  "f": "x**2 + y**2",
+  "x0": 0,
+  "y0": 1,
+  "xn": 1,
+  "h": 0.1
+}
+
+# Ejemplos para Método de Newton-Raphson
+# f(x) = x**2 - 2, x inicial = 1, precisión = 6
+{
+  "funcion": "x**2 - 2",
+  "x_ini": 1,
+  "precision": 6
+}
+
+# f(x) = x**3 - x - 1, x inicial = 1, precisión = 6
+{
+  "funcion": "x**3 - x - 1",
+  "x_ini": 1,
+  "precision": 6
+}
+
+# Ejemplos para Método de Runge-Kutta
+# f(x, y) = x + y, x0 = 0, y0 = 1, xn = 1, h = 0.1
+{
+  "f": "x + y",
+  "x0": 0,
+  "y0": 1,
+  "xn": 1,
+  "h": 0.1
+}
+
+# f(x, y) = x**2 + y**2, x0 = 0, y0 = 1, xn = 1, h = 0.1
+{
+  "f": "x**2 + y**2",
+  "x0": 0,
+  "y0": 1,
+  "xn": 1,
+  "h": 0.1
+}
