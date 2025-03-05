@@ -28,8 +28,14 @@ Para comenzar a utilizar el Proyecto Calculadora, sigue estos pasos de instalaci
 2. **Iniciar Proyecto:**
    ```bash
    # Iniciar con:
-   python3 serve.py
+   python run.py
    ```
+3. **Versión de Python:**
+
+   ```bash
+   Python 3.11.9
+   ```
+
    La aplicación se iniciará en [http://localhost:5000/](http://localhost:5000/).
 
 ---
